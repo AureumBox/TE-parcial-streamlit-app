@@ -1,24 +1,20 @@
 import streamlit as st
 import pandas as pd
 
-# Cargar dataset
 @st.cache_data
 def cargar_datos():
     return pd.read_csv("dataset_inventario_consumomax.csv", parse_dates=["Fecha_Ingreso"])
 
 df = cargar_datos()
 
-# Configurar página
 st.set_page_config(
     page_title="Sistema de Inventario ConsumoMax",
     page_icon=" ",
     layout="wide"
 )
 
-# Título principal
 st.title("Sistema Inteligente de Control de Inventario - ConsumoMax")
 
-# Filtros laterales
 st.sidebar.header("Filtros de búsqueda")
 almacen = st.sidebar.multiselect(
     "Seleccionar almacén:",
@@ -31,17 +27,14 @@ categoria = st.sidebar.multiselect(
     default=df["Categoria"].unique()
 )
 
-# Aplicar filtros
 df_filtrado = df[
     (df["Almacen"].isin(almacen)) &
     (df["Categoria"].isin(categoria))
 ]
 
-# Mostrar datos filtrados
 st.subheader("Inventario actual")
 st.dataframe(df_filtrado, use_container_width=True)
 
-# KPIs principales
 st.subheader("Indicadores rápidos")
 col1, col2, col3 = st.columns(3)
 
@@ -57,7 +50,6 @@ with col3:
         value=(df_filtrado["Cantidad_Actual"] < df_filtrado["Umbral_Minimo"]).sum()
     )
 
-# Gráficos
 st.subheader("Distribución de Stock por Categoría")
 stock_categoria = df_filtrado.groupby("Categoria")["Cantidad_Actual"].sum()
 st.bar_chart(stock_categoria)
